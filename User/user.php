@@ -56,7 +56,7 @@ function SignUp($originJSON){
   }
 
   require_once('./FileManage/fileManage.php');
-  $name = uploadFile();
+  $names = uploadFile();
 
   $STMT = $_CONN -> prepare('INSERT INTO NN_USER(Id, Pwd, Gender, School, AuthOk, Token, IdCardDir) VALUES(?,?,?,?,0,?,?)');
   @$STMT->bind_param('sssiss',  trim($originJSON['user']['id']),
@@ -64,7 +64,7 @@ function SignUp($originJSON){
                                trim($originJSON['user']['gender']),
                                $originJSON['user']['school'],
                                trim($originJSON['user']['token']),
-                               trim($name));
+                               trim($names[0]));
 
 
   $STMT->execute();
