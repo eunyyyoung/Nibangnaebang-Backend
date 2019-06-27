@@ -21,6 +21,11 @@ switch($postJSON['query']){
     echo createSellRoom($postJSON);
     break;
 
+  case 'uploadRoomImg' :
+    require_once('./Room/room.php');
+    echo uploadRoomImg($postJSON);
+    break;
+
   case 'Find':
     require_once('./Room/room.php');
     echo findARoom($postJSON);
@@ -31,6 +36,11 @@ switch($postJSON['query']){
     echo showRoomList($postJSON);
     break;
 
+  case 'searchFilter' :
+    require_once('./Room/room.php');
+    echo searchFilter($postJSON);
+    break;
+    
   case 'PostMsg' :
     echo postMessage($postJSON);
     break;

@@ -35,11 +35,17 @@ function getSummaryMessage($originJSON){
     $ROW2 = mysqli_fetch_assoc($RES2);
     $MSG = $ROW2['Msg'];
 
+    $STMT = $_CONN -> prepare("SELECT Id,Gender,School FROM NN_USER WHERE No=?");
+    @$STMT->bind_param("i", $OtherUser);
+    $STMT->execute();
+    $RES3 = $STMT->get_result();
+    $ROW3 = mysqli_fetch_assoc($RES3);
+
     if($MSG == NULL){
       $MSG = "";
     }
 
-    array_push($jsonObj,array('roomNo'=>$ROW['No'], 'otherUser' => $OtherUser, 'lastMsg' => $MSG));
+    array_push($jsonObj,array('roomNo'=>$ROW['No'], 'otherUser' => $OtherUser,'otherUserId'=>$ROW3['Id'], 'otherUserGender'=>$ROW3['Gender'], 'otherUserSchool'=>$ROW3['School'], 'lastMsg' => $MSG));
 
   }
   return json_encode($jsonObj);
@@ -51,7 +57,9 @@ function getFullMessage($originJSON){
   }
   require_once('./DBConfig/DBConfig.php');
 
-  $STMT = $_CONN -> prepare("SELECT * FROM NN_MESSAGE WHERE Parent=? ORDER BY no ASC");
+    $STMT = $_CONN -> prepare("SELECT NN_MESSAGE.No, NN_MESSAGE.SendUserNo, (SELECT Id FROM NN_USER WHERE NN_USER.No=NN_MESSAGE.SendUserNo) AS SenderId, (SELECT Gender FROM NN_USER WHERE NN_USER.No=SendUserNo) AS SenderGender,
+    NN_MESSAGE.ReceiveUserNo, (SELECT Id FROM NN_USER WHERE NN_USER.No=NN_MESSAGE.ReceiveUserNo) AS ReceiverId, (SELECT Gender FROM NN_USER WHERE NN_USER.No=NN_MESSAGE.ReceiveUserNo) AS ReceiverGender, Msg, LogDate FROM NN_MESSAGE WHERE Parent=? ORDER BY no ASC");
+
   @$STMT->bind_param("i", $originJSON['roomNo']);
   $STMT->execute();
 
@@ -60,7 +68,11 @@ function getFullMessage($originJSON){
   while($ROW = mysqli_fetch_assoc($RES)){
     array_push($jsonObj, array('no'=>$ROW['No'],
                                'sendUser'=>$ROW['SendUserNo'],
+                               'sendUserId'=>$ROW['SenderId'],
+                               'sendUserGender'=>$ROW['SenderGender'],
                                'receiveUser'=>$ROW['ReceiveUserNo'],
+                               'receiveUserId'=>$ROW['ReceiverId'],
+                               'receiveUserGender'=>$ROW['ReceiverGender'],
                                'msg'=>$ROW['Msg'],
                                'logDate'=>$ROW['LogDate']));
   }
