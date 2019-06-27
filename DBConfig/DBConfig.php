@@ -1,9 +1,9 @@
 <?php
 
 define("DB_HOST", "localhost");
-define("USER_NAME", "*******");
-define("PASS", "*******");
-define("DB_NAME", "*******");
+define("USER_NAME", "alld");
+define("PASS", "alp03100716");
+define("DB_NAME", "alld");
 
 $_CONN = mysqli_connect(DB_HOST, USER_NAME, PASS, DB_NAME); //DataBase Connection
 
