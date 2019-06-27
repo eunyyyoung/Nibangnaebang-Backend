@@ -7,6 +7,6 @@ $postJSON = json_decode(base64_decode(file_get_contents("php://input")), true);
 switch($postJSON['query']){
 
   default :
-    echo sendWrongRequestMsg(); break;
+    sendWrongRequestMsg(); break;
 }
  ?>
