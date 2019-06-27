@@ -34,6 +34,15 @@ switch($postJSON['query']){
   case 'PostMsg' :
     echo postMessage($postJSON);
     break;
+
+  case 'getSummaryMessage' :
+    echo getSummaryMessage($postJSON);
+    break;
+
+  case 'getFullMessage' :
+    echo getFullMessage($postJSON);
+    break;
+
   default :
     echo sendWrongRequestMsg(); break;
 }

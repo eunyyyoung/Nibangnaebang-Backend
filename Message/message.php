@@ -7,6 +7,68 @@ function sendWrongRequestMsg(){
   return json_encode($jsonObj);
 }
 
+function getSummaryMessage($originJSON){
+  if(!(isset($originJSON['nowUser']))){
+    return sendWrongRequestMsg();
+  }
+
+  require_once('./DBConfig/DBConfig.php');
+  $STMT = $_CONN -> prepare("SELECT * FROM NN_MESSAGEBOX WHERE (user1No=? or user2No=?)");
+  @$STMT->bind_param("ii", $originJSON['nowUser'], $originJSON['nowUser']);
+  $STMT->execute();
+  $RES = $STMT->get_result();
+  $jsonObj = array();
+  while($ROW = mysqli_fetch_assoc($RES)){
+
+    $OtherUser = 0;
+
+    if($ROW['user1No'] == $originJSON['nowUser']){
+      $OtherUser = $ROW['user2No'];
+    }else if($ROW['user2No'] == $originJSON['nowUser']){
+      $OtherUser = $ROW['user1No'];
+    }
+
+    $STMT = $_CONN -> prepare("SELECT Msg FROM NN_MESSAGE WHERE SendUserNo=? ORDER BY No DESC LIMIT 1");
+    @$STMT->bind_param("i", $OtherUser);
+    $STMT->execute();
+    $RES2 = $STMT->get_result();
+    $ROW2 = mysqli_fetch_assoc($RES2);
+    $MSG = $ROW2['Msg'];
+
+    if($MSG == NULL){
+      $MSG = "";
+    }
+
+    array_push($jsonObj,array('roomNo'=>$ROW['No'], 'otherUser' => $OtherUser, 'lastMsg' => $MSG));
+
+  }
+  return json_encode($jsonObj);
+}
+
+function getFullMessage($originJSON){
+  if(!(isset($originJSON['roomNo']))){
+    return sendWrongRequestMsg();
+  }
+  require_once('./DBConfig/DBConfig.php');
+
+  $STMT = $_CONN -> prepare("SELECT * FROM NN_MESSAGE WHERE Parent=? ORDER BY no ASC");
+  @$STMT->bind_param("i", $originJSON['roomNo']);
+  $STMT->execute();
+
+  $RES = $STMT->get_result();
+  $jsonObj = array();
+  while($ROW = mysqli_fetch_assoc($RES)){
+    array_push($jsonObj, array('no'=>$ROW['No'],
+                               'sendUser'=>$ROW['SendUserNo'],
+                               'receiveUser'=>$ROW['ReceiveUserNo'],
+                               'msg'=>$ROW['Msg'],
+                               'logDate'=>$ROW['LogDate']));
+  }
+
+  return json_encode($jsonObj);
+
+}
+
 function postMessage($originJSON){
   if(!(isset($originJSON['sendUser']) && isset($originJSON['receiveUser']) && isset($originJSON['msg']))){
     return sendWrongRequestMsg();
