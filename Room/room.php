@@ -23,7 +23,7 @@ function showRoomList(){
 function findARoom($originJSON){
     require_once('./DBConfig/DBConfig.php');
 
-    $STMT = $_CONN->prepare('SELECT NN_ROOM.No AS Num,Seller,(SELECT Id FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerName, (SELECT Gender FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerGender,Title,Address,Lat,Lng,ALStart,ALEnd,Detail,Pay,IsLoad,LogDate,IsView,PayType,School,SameGender
+    $STMT = $_CONN->prepare('SELECT NN_ROOM.No AS Num,Seller,(SELECT Id FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerName, (SELECT Gender FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerGender,Title,Address,ALStart,ALEnd,Detail,Pay,LogDate,IsView,School,SameGender
       FROM NN_ROOM RIGHT JOIN NN_ROOMIMG ON NN_ROOM.No = NN_ROOMIMG.RoomNo WHERE NN_ROOM.No=?');
 
     @$STMT->bind_param("i",$originJSON['RoomNo']);
@@ -129,7 +129,7 @@ function searchFilter($originJSON){
       return sendWrongRequestMsg();
   }
 
-  $totalQuery = "SELECT NN_ROOM.No AS Num,Seller,(SELECT Id FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerName, (SELECT Gender FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerGender,Title,Address,Lat,Lng,ALStart,ALEnd,Detail,Pay,IsLoad,LogDate,IsView,PayType,School,SameGender FROM NN_ROOM WHERE School='".$originJSON['searchKey']."'";
+  $totalQuery = "SELECT NN_ROOM.No AS Num,Seller,(SELECT Id FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerName, (SELECT Gender FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerGender,Title,Address,ALStart,ALEnd,Detail,Pay,LogDate,IsView,School,SameGender FROM NN_ROOM WHERE School='".$originJSON['searchKey']."'";
 
   if(isset($originJSON['opt'])){
     $optStr = $originJSON['opt'];
