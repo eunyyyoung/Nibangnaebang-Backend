@@ -23,10 +23,8 @@ function showRoomList(){
 function findARoom($originJSON){
     require_once('./DBConfig/DBConfig.php');
 
-    $STMT = $_CONN->prepare('SELECT * FROM NN_ROOM LEFT JOIN NN_ROOMIMG ON NN_ROOM.No = NN_ROOMIMG.RoomNo
-                            UNION ALL
-                            SELECT * FROM NN_ROOM RIGHT JOIN NN_ROOMIMG ON NN_ROOM.No = NN_ROOMIMG.RoomNo
-                            WHERE NN_ROOM.No=?');
+    $STMT = $_CONN->prepare('SELECT NN_ROOM.No AS Num,Seller,(SELECT Id FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerName, (SELECT Gender FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerGender,Title,Address,ALStart,ALEnd,Detail,Pay,LogDate,IsView,School,SameGender
+      FROM NN_ROOM RIGHT JOIN NN_ROOMIMG ON NN_ROOM.No = NN_ROOMIMG.RoomNo WHERE NN_ROOM.No=?');
 
     @$STMT->bind_param("i",$originJSON['RoomNo']);
 
@@ -49,7 +47,7 @@ function findARoom($originJSON){
                         'LogDate'=>$ROW['LogDate'],
                         'IsView'=>$ROW['IsView'],
                         'School'=>$ROW['School'],
-                        'RoomNo' => $ROW['RoomNo'],
+                        'RoomNo' => $ROW['Num'],
                         'SameGender'=>$ROW['SameGender']];
 
      $jsonObj['images'] = array();
