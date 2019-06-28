@@ -8,7 +8,7 @@ function Login($originJSON){
 
   require_once('./DBConfig/DBConfig.php');
 
-  $STMT = $_CONN->prepare('SELECT COUNT(*), No FROM NN_USER WHERE Id=? and Pwd=? and AuthOk=1');
+  $STMT = $_CONN->prepare('SELECT COUNT(*), No, Id, Gender, School FROM NN_USER WHERE Id=? and Pwd=? and AuthOk=1');
   @$STMT->bind_param('ss',trim($originJSON['id']), trim($originJSON['pwd']));
   $STMT->execute();
   $RES = $STMT->get_result();
@@ -18,7 +18,7 @@ function Login($originJSON){
   if($ROW = mysqli_fetch_assoc($RES)){
 
     if($ROW['COUNT(*)'] == 1){
-        $jsonObj += [ 'IsExistUser' => 1, 'UserNo' => $ROW['No']];
+        $jsonObj += [ 'IsExistUser' => 1, 'UserNo' => $ROW['No'], 'Id' => $ROW['Id'], 'Gender' => $ROW['Gender'], 'School' => $ROW['School']];
         return json_encode($jsonObj);
     }
     else {
@@ -56,27 +56,27 @@ function SignUp($originJSON){
   }
 
   require_once('./FileManage/fileManage.php');
-  $name = uploadFile();
+  $names = uploadFile();
 
-  $STMT = $_CONN -> prepare('INSERT INTO NN_USER(Id, Pwd, Gender, School, AuthOk, Token, IdCardDir) VALUES(?,?,?,?,0,?,?)');
-  @$STMT->bind_param('sssiss',  trim($originJSON['user']['id']),
+  $STMT = $_CONN -> prepare('INSERT INTO NN_USER(Id, Pwd, Gender, School, AuthOk, Token, IdCardDir) VALUES(?,?,?,?,1x,?,?)');
+  @$STMT->bind_param('ssssss', trim($originJSON['user']['id']),
                                trim($originJSON['user']['pwd']),
                                trim($originJSON['user']['gender']),
-                               $originJSON['user']['school'],
+                               trim($originJSON['user']['school']),
                                trim($originJSON['user']['token']),
-                               trim($name));
+                               trim($names));
 
 
   $STMT->execute();
 
-  $STMT = $_CONN->prepare('SELECT COUNT(*) FROM NN_USER WHERE Id=?');
+  $STMT = $_CONN->prepare('SELECT No, Id, Gender, School FROM NN_USER WHERE Id=?');
   @$STMT->bind_param("s", trim($originJSON['user']['id']));
   $STMT->execute();
   $RES = $STMT->get_result();
 
   if($ROW = mysqli_fetch_assoc($RES)){
-    if($ROW['COUNT(*)'] == 1){
-      $jsonObj += ['ResCode' => 200, 'ResMsg' => 'Success'];
+    if($ROW['No'] >= 1){
+      $jsonObj += ['ResCode' => 200, 'ResMsg' => 'Success', 'No'=>$ROW['No'], 'Id'=>$ROW['Id'], 'Gender'=>$ROW['Gender'], 'School'=>$ROW['School']];
       return json_encode($jsonObj);
     }else {
       $jsonObj += ['ResCode' => 200, 'ResMsg' => 'Fail'];

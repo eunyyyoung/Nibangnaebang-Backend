@@ -6,7 +6,7 @@ function showRoomList(){
 
     $STMT = $_CONN->prepare('SELECT NN_ROOM.No, NN_ROOM.Pay, NN_ROOM.ALStart, NN_ROOM.ALEnd, NN_ROOM.Title, NN_ROOM.School, NN_ROOMIMG.Dir
                                 FROM NN_ROOM LEFT JOIN NN_ROOMIMG ON NN_ROOM.No = NN_ROOMIMG.RoomNo
-                                Where IsView = 0 ORDER BY LogDate DESC');
+                                Where IsView = 1 ORDER BY LogDate DESC');
     $STMT->execute();
     $RES = $STMT->get_result();
 
@@ -69,7 +69,7 @@ function createSellRoom($originJSON){
 
     require_once('./DBConfig/DBConfig.php');
 
-    $STMT = $_CONN->prepare("INSERT INTO NN_ROOM(ALStart, ALEnd, Pay, Address, Title, Detail, Seller, SameGender ,School, LogDate) VALUES(?,?,?,?,?,?,?,?,?,?)");
+    $STMT = $_CONN->prepare("INSERT INTO NN_ROOM(ALStart, ALEnd, Pay, Address, Title, Detail, Seller, SameGender ,School, LogDate, IsView) VALUES(?,?,?,?,?,?,?,?,?,?,1)");
     @$STMT->bind_param("ssisssiiss", trim($originJSON['room']['ALStart']),
                                     trim($originJSON['room']['ALEnd']),
                                     $originJSON['room']['pay'],
@@ -129,7 +129,7 @@ function searchFilter($originJSON){
       return sendWrongRequestMsg();
   }
 
-  $totalQuery = "SELECT NN_ROOM.No AS Num,Seller,(SELECT Id FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerName, (SELECT Gender FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerGender,Title,Address,ALStart,ALEnd,Detail,Pay,LogDate,IsView,School,SameGender FROM NN_ROOM WHERE School='".$originJSON['searchKey']."'";
+  $totalQuery = "SELECT NN_ROOM.No AS Num,Seller,(SELECT Id FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerName, (SELECT Gender FROM NN_USER WHERE No=NN_ROOM.Seller) AS SellerGender,Title,Address,ALStart,ALEnd,Detail,Pay,LogDate,IsView,School,SameGender FROM NN_ROOM WHERE School='".$originJSON['searchKey']."' and IsView=1";
 
   if(isset($originJSON['opt'])){
     $optStr = $originJSON['opt'];
@@ -187,6 +187,21 @@ function searchFilter($originJSON){
 
     return json_encode($jsonObj);
 
+}
+
+function acceptRoom($originJSON){
+  if(!isset($originJSON['RoomNo'])){
+    return sendWrongRequestMsg();
+  }
+
+  require_once('./DBConfig/DBConfig.php');
+  $STMT = $_CONN->prepare("UPDATE NN_ROOM SET IsView=0 WHERE No=?");
+  @$STMT->bind_param("i",$originJSON['RoomNo']);
+  $STMT->execute();
+
+  $jsonObj = array();
+  $jsonObj += ['code' => 'success'];
+  return json_encode($jsonObj);
 }
 
  ?>

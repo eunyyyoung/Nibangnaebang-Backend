@@ -16,6 +16,52 @@ switch($postJSON['query']){
     require_once('./User/user.php');
     echo SignUp($postJSON);
     break;
+  case 'Create':
+    require_once('./Room/room.php');
+    echo createSellRoom($postJSON);
+    break;
+
+  case 'uploadRoomImg' :
+    require_once('./Room/room.php');
+    echo uploadRoomImg($postJSON);
+    break;
+
+  case 'Find':
+    require_once('./Room/room.php');
+    echo findARoom($postJSON);
+    break;
+
+  case 'ShowList':
+    require_once('./Room/room.php');
+    echo showRoomList($postJSON);
+    break;
+
+  case 'searchFilter' :
+    require_once('./Room/room.php');
+    echo searchFilter($postJSON);
+    break;
+
+  case 'PostMsg' :
+    echo postMessage($postJSON);
+    break;
+
+  case 'getSummaryMessage' :
+    echo getSummaryMessage($postJSON);
+    break;
+
+  case 'getFullMessage' :
+    echo getFullMessage($postJSON);
+    break;
+
+  case 'mirror' :
+    print_r($_FILES);
+    break;
+
+  case 'acceptRoom' :
+    require_once('./Room/room.php');
+    echo acceptRoom($postJSON);
+    break;
+
   default :
     echo sendWrongRequestMsg(); break;
 }
